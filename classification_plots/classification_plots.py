@@ -221,8 +221,8 @@ def MakeCombinedPlot(signal_data, track_data):
     ax[0,0].set_title('$\\nu / \\mu$', fontsize = 18)
     ax[0,1].set_title('$\\mathcal{T}\\, / \\,\\mathcal{C}$', fontsize = 18)
 
-    ax[0,0].set_ylabel('True Positive Rate', size = 14)
-    ax[0,0].set_xlabel('False Positive Rate', size = 14)
+    ax[0,0].set_ylabel('True Positive Rate', size = 10)
+    ax[0,0].set_xlabel('False Positive Rate', size = 10)
     #plt.xticks(fontsize=6)
     #ax[0].tick_params(axis='x', labelsize=6)
 
@@ -252,6 +252,7 @@ def MakeCombinedPlot(signal_data, track_data):
 
     
     ax[0,0].legend(fontsize = 8, frameon = False)#, loc = 'upper right')
+    ax[0,0].set_yticks(np.arange(0.50, 1, 0.10))
     ax[0,0].set_ylim([0.55,1])
     ax[0,0].set_xlim([-0.05,0.6])
     #ax[0,0].text(0.45,0.79, '$\\nu / \\mu$', fontsize = 18)
@@ -263,16 +264,17 @@ def MakeCombinedPlot(signal_data, track_data):
     ax[1,0].hist(signal_data['L7_MuonClassifier_FullSky_ProbNu'][signal_data['neutrino']==1], histtype = 'step', label = 'BDT  $\\nu$', bins = bins, color = 'tab:orange', density = True)
     ax[1,0].plot([0.8,0.8], [0,18], color = 'red', ls = '--')
     ax[1,0].text(0.75, 7, 'Threshold', rotation = 'vertical', color = 'red', fontsize = 10)
-    ax[1,0].set_ylabel('Area Normalized Counts', size = 14)
-    ax[1,0].set_xlabel('Neutrino Score', size = 14)
+    ax[1,0].set_ylabel('Area Normalized Counts', size = 10)
+    ax[1,0].set_xlabel('Neutrino Score', size = 10)
     ax[1,0].legend(fontsize = 8, frameon = False)
+    
     #ax[1,0].set_yscale('log')
     ## Tracks
     data = remove_muons(track_data)
     data['track_pred'] = expit(data['track_pred'])
 
     #plt.title('Track/Cascade', size = 8)
-    ax[0,1].set_xlabel('False Positive Rate', size = 14)
+    ax[0,1].set_xlabel('False Positive Rate', size = 10)
     #ax[1].set_ylabel('True Positive Rate', size = 14)
 
     fpr, tpr, threshold = roc_curve(data['track'], data['track_pred'])  
@@ -288,7 +290,7 @@ def MakeCombinedPlot(signal_data, track_data):
     #empty_string_labels = ['']*len(labels)
     #ax[1].set_yticklabels(empty_string_labels)
     ax[0,1].set_ylim([0,1])
-    ax[0,1].legend(fontsize = 8, frameon = False, loc = 'upper left')
+    ax[0,1].legend(fontsize = 8, frameon = False, loc = 'lower right') #, loc = 'upper left')
     ax[0,1].yaxis.tick_right()
     ax[0,1].yaxis.set_label_position("right")
     #ax[0,1].text(0.5,0.40, '$\\mathcal{T}\\, / \\,\\mathcal{C}$', fontsize = 18)
@@ -301,8 +303,18 @@ def MakeCombinedPlot(signal_data, track_data):
     #ax[1,1].set_yscale('log')
     ax[1,1].yaxis.tick_right()
     ax[1,1].yaxis.set_label_position("right")
-    ax[1,1].set_xlabel('Track Score', size = 14)
+    ax[1,1].set_xlabel('Track Score', size = 10)
     ax[1,1].legend(fontsize = 8, frameon = False)
+
+    ax[0,0].tick_params(axis='x', labelsize=10)
+    ax[0,0].tick_params(axis='y', labelsize=10)
+    ax[1,0].tick_params(axis='x', labelsize=10)
+    ax[1,0].tick_params(axis='y', labelsize=10)
+
+    ax[0,1].tick_params(axis='x', labelsize=10)
+    ax[0,1].tick_params(axis='y', labelsize=10)
+    ax[1,1].tick_params(axis='x', labelsize=10)
+    ax[1,1].tick_params(axis='y', labelsize=10)
 
     fig.savefig('combined.pdf',bbox_inches="tight")
     return
