@@ -16,6 +16,8 @@ from copy import deepcopy
 from os.path import exists
 import pickle
 
+indir = '/remote/ceph/user/o/oersoe/paper_data/paper/paper_data/plots/performance_statistics.pickle'
+
 def parallel_50th_error(settings):
     queue, n_samples, batch_size, diff = settings
     rng = np.random.default_rng(42)
@@ -541,12 +543,12 @@ def make_resolution_plots(targets, plot_config, include_retro, track_cascade = F
     markersize = 4
     key_limits = plot_config['width']
     key_bins = plot_config['key_bins']
-    if exists('/home/iwsatlas1/oersoe/phd/paper/paper_data/plots/performance_statistics.pickle'):
-        with open('/home/iwsatlas1/oersoe/phd/paper/paper_data/plots/performance_statistics.pickle', 'rb') as handle:
+    if exists('/remote/ceph/user/o/oersoe/paper_data/paper/paper_data/plots/performance_statistics.pickle'):
+        with open('/remote/ceph/user/o/oersoe/paper_data/paper/paper_data/plots/performance_statistics.pickle', 'rb') as handle:
             biases = pickle.load(handle)
     else:
         biases = CalculateStatistics(data,targets, key_bins,include_retro = True)
-        with open('/home/iwsatlas1/oersoe/phd/paper/paper_data/plots/performance_statistics.pickle', 'wb') as handle:
+        with open('/remote/ceph/user/o/oersoe/paper_data/paper/paper_data/plots/performance_statistics.pickle', 'wb') as handle:
             pickle.dump(biases, handle, protocol=pickle.HIGHEST_PROTOCOL)
     for key in biases['dynedge'].keys():
         fig = plt.figure(constrained_layout = True)
@@ -693,16 +695,17 @@ def make_combined_resolution_plot(targets, plot_config, include_retro, track_cas
 
     key_limits = plot_config['width']
     key_bins = plot_config['key_bins']
-    if exists('/home/iwsatlas1/oersoe/phd/paper/paper_data/plots/performance_statistics.pickle'):
-        with open('/home/iwsatlas1/oersoe/phd/paper/paper_data/plots/performance_statistics.pickle', 'rb') as handle:
+    if exists('/remote/ceph/user/o/oersoe/paper_data/paper/paper_data/plots/performance_statistics.pickle'):
+        with open('/remote/ceph/user/o/oersoe/paper_data/paper/paper_data/plots/performance_statistics.pickle', 'rb') as handle:
             biases = pickle.load(handle)
     else:
         biases = CalculateStatistics(data,targets, key_bins,include_retro = True)
-        with open('/home/iwsatlas1/oersoe/phd/paper/paper_data/plots/performance_statistics.pickle', 'wb') as handle:
+        with open('/remote/ceph/user/o/oersoe/paper_data/paper/paper_data/plots/performance_statistics.pickle', 'wb') as handle:
             pickle.dump(biases, handle, protocol=pickle.HIGHEST_PROTOCOL)
     fig = plt.figure(constrained_layout = True)
     fig.set_size_inches(width, height)
     gs = fig.add_gridspec(6*2, 6*2)
+    blk_like = 'white'
     for key in targets:
         print(key)
         ax1, ax2 = get_axis(key, fig, gs)
@@ -728,7 +731,7 @@ def make_combined_resolution_plot(targets, plot_config, include_retro, track_cas
         plot_data_retro_cascade['width_error'] = np.array(plot_data_retro_cascade['width_error'])
         if len(plot_data_track['mean']) != 0:
             if mode == 'area':
-                ax1.plot(plot_data_track['mean'],plot_data_track['width'],linestyle='solid', lw = 0.5, color = 'black', alpha = 1)
+                ax1.plot(plot_data_track['mean'],plot_data_track['width'],linestyle='solid', lw = 0.5, c='tab:blue') # , alpha = 1
                 #ax1.plot( plot_data_track['mean'], plot_data_track['width'] - plot_data_track['width_error'],linestyle='solid', color = 'tab:blue', alpha = 1, lw = 0.25,label = 'dynedge Track')
                 #ax1.plot( plot_data_track['mean'], plot_data_track['width'] + plot_data_track['width_error'],linestyle='solid', color = 'tab:blue', alpha = 1, lw = 0.25)
                 l1 =  ax1.fill_between(plot_data_track['mean'],plot_data_track['width'] - plot_data_track['width_error'], plot_data_track['width'] + plot_data_track['width_error'],color = 'tab:blue', alpha = 0.8 ,label = 'dynedge Track')
@@ -739,7 +742,7 @@ def make_combined_resolution_plot(targets, plot_config, include_retro, track_cas
                 l2 = ax1.fill_between(plot_data_cascade['mean'], plot_data_cascade['width']- plot_data_cascade['width_error'], plot_data_cascade['width']+ plot_data_cascade['width_error'], color = 'tab:blue', alpha = 0.3, label = 'dynedge Cascade' )
             if include_retro:
                 if mode == 'area':
-                    ax1.plot(plot_data_retro_track['mean'],plot_data_retro_track['width'],linestyle='solid', color = 'black', lw = 0.5, alpha = 1)
+                    ax1.plot(plot_data_retro_track['mean'],plot_data_retro_track['width'],linestyle='solid', lw = 0.5, c='tab:orange') # , color = blk_like, , alpha = 1, c='tab:orange'
                     #ax1.plot(plot_data_retro_track['mean'],plot_data_retro_track['width'] - plot_data_retro_track['width_error'],linestyle='dotted', color = 'tab:orange', alpha = 1)
                     #ax1.plot(plot_data_retro_track['mean'],plot_data_retro_track['width'] + plot_data_retro_track['width_error'],linestyle='dotted', color = 'tab:orange', alpha = 1)
                     l3 = ax1.fill_between(plot_data_retro_track['mean'],plot_data_retro_track['width'] - plot_data_retro_track['width_error'],plot_data_retro_track['width'] + plot_data_retro_track['width_error'], color = 'tab:orange', alpha = 0.8,label = 'Retro Track')
@@ -752,15 +755,15 @@ def make_combined_resolution_plot(targets, plot_config, include_retro, track_cas
             empty_string_labels = ['']*len(labels)
             ax1.set_xticklabels(empty_string_labels)
             #ax1.grid()
-            ax2.plot(plot_data_track['mean'], np.repeat(0, len(plot_data_track['mean'])), color = 'black', lw = 1)
+            ax2.plot(plot_data_track['mean'], np.repeat(0, len(plot_data_track['mean'])), color = 'tab:orange', lw = 1, alpha=0.8, zorder=0)
             #rel_imp_error = abs(1 - np.array(plot_data['width'])/np.array(plot_data_retro['width']))*np.sqrt((np.array(plot_data_retro['width_error'])/np.array(plot_data_retro['width']))**2 + (np.array(plot_data['width_error'])/np.array(plot_data['width']))**2)
             if include_retro:
                 if mode == 'area':
-                    ax2.plot(plot_data_track['mean'],(1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']))*100, color = 'black', lw = 0.5, alpha = 1,linestyle='solid')
-                    l5 = ax2.fill_between(plot_data_track['mean'], (1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']))*100 - CalculateRelativeImprovementError(1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']), plot_data_track['width'], plot_data_track['width_error'], plot_data_retro_track['width'], plot_data_retro_track['width_error'])*100, (1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']))*100 + CalculateRelativeImprovementError(1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']), plot_data_track['width'], plot_data_track['width_error'], plot_data_retro_track['width'], plot_data_retro_track['width_error'])*100, label = 'Track', color = 'tab:olive')
+                    ax2.plot(plot_data_track['mean'],(1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']))*100, lw = 0.5, alpha = 1,linestyle='solid', c='tab:blue') # , color = blk_like
+                    l5 = ax2.fill_between(plot_data_track['mean'], (1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']))*100 - CalculateRelativeImprovementError(1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']), plot_data_track['width'], plot_data_track['width_error'], plot_data_retro_track['width'], plot_data_retro_track['width_error'])*100, (1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']))*100 + CalculateRelativeImprovementError(1 - np.array(plot_data_track['width'])/np.array(plot_data_retro_track['width']), plot_data_track['width'], plot_data_track['width_error'], plot_data_retro_track['width'], plot_data_retro_track['width_error'])*100, color = 'tab:blue', alpha=0.7) # , label = 'Track'
                     
-                    ax2.plot(plot_data_cascade['mean'],(1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']))*100 , color = 'black', alpha = 0.5, lw = 0.5,linestyle='solid')
-                    l6 = ax2.fill_between(plot_data_cascade['mean'], (1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']))*100 -  CalculateRelativeImprovementError(1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']), plot_data_cascade['width'], plot_data_cascade['width_error'], plot_data_retro_cascade['width'], plot_data_retro_cascade['width_error'])*100, (1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']))*100 +  CalculateRelativeImprovementError(1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']), plot_data_cascade['width'], plot_data_cascade['width_error'], plot_data_retro_cascade['width'], plot_data_retro_cascade['width_error'])*100,  label = 'Cascade', color = 'tab:green')
+                    ax2.plot(plot_data_cascade['mean'],(1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']))*100 , lw = 0.5, c='tab:blue', linestyle='dashed') # , color = blk_like, alpha = 0.5,linestyle='solid'
+                    l6 = ax2.fill_between(plot_data_cascade['mean'], (1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']))*100 -  CalculateRelativeImprovementError(1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']), plot_data_cascade['width'], plot_data_cascade['width_error'], plot_data_retro_cascade['width'], plot_data_retro_cascade['width_error'])*100, (1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']))*100 +  CalculateRelativeImprovementError(1 - np.array(plot_data_cascade['width'])/np.array(plot_data_retro_cascade['width']), plot_data_cascade['width'], plot_data_cascade['width_error'], plot_data_retro_cascade['width'], plot_data_retro_cascade['width_error'])*100, color = 'tab:blue', alpha=0.3) # ,  label = 'Cascade'
                     #ax2.legend(frameon=False, fontsize = 6)
                 
             
@@ -775,7 +778,8 @@ def make_combined_resolution_plot(targets, plot_config, include_retro, track_cas
 
             if key == 'energy':
                 unit_tag = '(%)'
-                ax1.legend([l1,l2,l3,l4,l5,l6], ['dynedge $\\mathcal{T}$','dynedge $\\mathcal{C}$', 'Retro $\\mathcal{T}$','Retro $\\mathcal{C}$', '$\\mathcal{T}$', '$\\mathcal{C}$'], ncol = 1, fontsize = 8, frameon = False)
+                ax1.legend([l1,l2,l3,l4], ['dynedge $\\mathcal{T}$','dynedge $\\mathcal{C}$', 'Retro $\\mathcal{T}$','Retro $\\mathcal{C}$'], ncol = 1, fontsize = 8, frameon = False)
+                # ax1.legend([l1,l2,l3,l4,l5,l6], ['dynedge $\\mathcal{T}$','dynedge $\\mathcal{C}$', 'Retro $\\mathcal{T}$','Retro $\\mathcal{C}$', '$\\mathcal{T}$', '$\\mathcal{C}$'], ncol = 1, fontsize = 8, frameon = False)
             else:
                 unit_tag = '(deg.)'
             if key == 'angular_res':
@@ -838,7 +842,7 @@ key_bins = { 'energy': np.arange(0, 3.25, 0.25),
                 'azimuth': np.arange(0, 2*180, 20) }
 
 
-plot_config = {'data': '/home/iwsatlas1/oersoe/phd/paper/paper_data/data/0000/reconstruction.csv',
+plot_config = {'data': '/remote/ceph/user/o/oersoe/paper_data/data/0000/reconstruction.csv',
                 'width': width_limits,
                 'key_bins': key_bins}
 #['zenith', 'energy','azimuth' ,'angular_res', 'XYZ']

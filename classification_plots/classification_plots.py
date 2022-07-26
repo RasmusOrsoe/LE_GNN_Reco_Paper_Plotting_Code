@@ -12,6 +12,8 @@ from copy import deepcopy
 mpl.use('pdf')
 #plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
+bdt_color = 'tab:orange'
+gnn_color = 'tab:blue'
 
 def remove_muons(data):
     data = data.loc[abs(data['pid'] != 13), :]
@@ -106,10 +108,10 @@ def MakeBackgroundSignalPlot(data):
     auc_score_retro_lvl7 = auc(fpr_retro_lvl7,tpr_retro_lvl7)
    
     y_lvl7, x_lvl7, y_retro_lvl7, x_retro_lvl7  = CalculatePoint(0.7, data)
-    plt.text(x_retro_lvl7[0] - 0.06, 0.86, '0.70 ' +'$\\nu_{\\alpha}$' + ' Score', rotation = 'vertical', color = 'red', fontsize = 7)
-    plt.plot(np.repeat(x_retro_lvl7, 1000),np.arange(0,1,0.001), '--', color = 'red')
-    plt.plot(fpr_retro_lvl7,tpr_retro_lvl7, label = 'Current BDT \n AUC: %s'%round(auc_score_retro_lvl7,5), color = 'orange', lw = 2)
-    plt.plot(fpr_lvl7, tpr_lvl7, label = 'dynedge \n AUC: %s'%round(auc_score_lvl7,5), color = 'blue', lw = 2)
+    plt.text(x_retro_lvl7[0] - 0.06, 0.86, '0.70 ' +'$\\nu_{\\alpha}$' + ' Score', rotation = 'vertical', color = 'tab:red', fontsize = 7)
+    plt.plot(np.repeat(x_retro_lvl7, 1000),np.arange(0,1,0.001), '--', color = 'tab:red')
+    plt.plot(fpr_retro_lvl7,tpr_retro_lvl7, label = 'Current BDT \n AUC: %s'%round(auc_score_retro_lvl7,5), color = bdt_color, lw = 2)
+    plt.plot(fpr_lvl7, tpr_lvl7, label = 'dynedge \n AUC: %s'%round(auc_score_lvl7,5), color = gnn_color, lw = 2)
 
 
     plt.plot(x_retro_lvl7, tpr_lvl7[ np.argmin(abs(fpr_lvl7 - x_retro_lvl7))], '^', color = 'lightblue')
@@ -120,7 +122,7 @@ def MakeBackgroundSignalPlot(data):
     plt.plot(0.24, 0.696, 'o', color = 'darkorange')
     plt.plot(0.24, 0.726, '^', color = 'lightblue')
     plt.text(0.27, 0.66, '(%s,%s)'%(str(round(fpr_lvl7[ np.argmin(abs(tpr_lvl7 - y_retro_lvl7))],4)), str(round(y_retro_lvl7[0],4))), color = 'blue', fontsize = 8)
-    plt.text(0.27, 0.69, '(%s,%s)'%(str(round(x_retro_lvl7[0],4)), str(round(y_retro_lvl7[0],4))), color = 'orange', fontsize = 8)
+    plt.text(0.27, 0.69, '(%s,%s)'%(str(round(x_retro_lvl7[0],4)), str(round(y_retro_lvl7[0],4))), color = bdt_color, fontsize = 8)
     plt.text(0.27, 0.72,'(%s,%s)'%(str(round(x_retro_lvl7[0],4)), str(round(tpr_lvl7[ np.argmin(abs(fpr_lvl7 - x_retro_lvl7))],4))), color = 'blue', fontsize = 8)
 
 
@@ -164,8 +166,8 @@ def MakeTrackCascadePlot(data, mode = 'physical'):
         auc_score = auc(fpr,tpr)
         auc_score_retro = auc(fpr_retro,tpr_retro)
 
-        plt.plot(fpr_retro,tpr_retro, label = 'Current BDT AUC: %s'%(round(auc_score_retro,3)), color = 'orange')
-        plt.plot(fpr, tpr, label = 'dynedge AUC: %s'%(round(auc_score,3)), color = 'blue')
+        plt.plot(fpr_retro,tpr_retro, label = 'Current BDT AUC: %s'%(round(auc_score_retro,3)), color = bdt_color)
+        plt.plot(fpr, tpr, label = 'dynedge AUC: %s'%(round(auc_score,3)), color = gnn_color)
         plt.legend(fontsize = 6)
         fig.savefig('track_cascade.pdf',bbox_inches="tight")
     if mode == 'auc_vs_E':
@@ -186,8 +188,8 @@ def MakeTrackCascadePlot(data, mode = 'physical'):
             mean_energy_in_bin.append(np.mean(np.log10(data_sliced['energy'])))
 
         print(mean_energy_in_bin)
-        plt.scatter(mean_energy_in_bin,auc_score_retro, label = 'Current BDT', color = 'orange')
-        plt.scatter(mean_energy_in_bin, auc_score, label = 'dynedge', color = 'blue')
+        plt.scatter(mean_energy_in_bin,auc_score_retro, label = 'Current BDT', color = bdt_color)
+        plt.scatter(mean_energy_in_bin, auc_score, label = 'dynedge', color = gnn_color)
         plt.legend(fontsize = 6)
         fig.savefig('track_cascade_energy_auc.pdf',bbox_inches="tight")
     if mode == 'physical':
@@ -198,10 +200,10 @@ def MakeTrackCascadePlot(data, mode = 'physical'):
         n_tracks, n_cascades, thresholds = calculate_track_cascade_density(data, is_retro = False)
         n_tracks_retro, n_cascades_retro, thresholds = calculate_track_cascade_density(data, is_retro = True)
  
-        plt.plot(thresholds,n_tracks_retro, label = 'Current BDT Track', color = 'orange')
-        plt.plot(thresholds,n_cascades_retro, label = 'Current BDT Cascades', ls = '--', color = 'orange')
-        plt.plot(thresholds, n_tracks, label = 'dynedge Track', color = 'blue')
-        plt.plot(thresholds, n_cascades, label = 'dynedge Cascades', ls = '--', color = 'blue')
+        plt.plot(thresholds,n_tracks_retro, label = 'Current BDT Track', color = bdt_color)
+        plt.plot(thresholds,n_cascades_retro, label = 'Current BDT Cascades', ls = '--', color = bdt_color)
+        plt.plot(thresholds, n_tracks, label = 'dynedge Track', color = gnn_color)
+        plt.plot(thresholds, n_cascades, label = 'dynedge Cascades', ls = '--', color = gnn_color)
         plt.legend(fontsize = 6)
         
         fig.savefig('track_cascade_physical.pdf',bbox_inches="tight")
@@ -232,22 +234,29 @@ def MakeCombinedPlot(signal_data, track_data):
     auc_score_retro_lvl7 = auc(fpr_retro_lvl7,tpr_retro_lvl7)
    
     y_lvl7, x_lvl7, y_retro_lvl7, x_retro_lvl7  = CalculatePoint(0.8, signal_data)
-    ax[0,0].text(x_retro_lvl7[0] - 0.03, 0.84, 'Threshold', rotation = 'vertical', color = 'red', fontsize = 10)
-    ax[0,0].plot(np.repeat(x_retro_lvl7, 1000),np.arange(0,1,0.001), '--', color = 'red')
-    ax[0,0].plot(fpr_retro_lvl7,tpr_retro_lvl7, label = 'BDT \n AUC: %s'%round(auc_score_retro_lvl7,3), color = 'orange', lw = 2)
-    ax[0,0].plot(fpr_lvl7, tpr_lvl7, label = 'Dynedge \n AUC: %s'%round(auc_score_lvl7,3), color = 'blue', lw = 2)
+    ax[0,0].text(x_retro_lvl7[0] - 0.03, 0.84, 'Threshold', rotation = 'vertical', color = 'tab:red', fontsize = 10)
+    ax[0,0].plot(np.repeat(x_retro_lvl7, 1000),np.arange(0,1,0.001), '--', color = 'tab:red')
+    ax[0,0].plot(fpr_retro_lvl7,tpr_retro_lvl7, label = 'BDT \n AUC: %s'%round(auc_score_retro_lvl7,3), color = bdt_color, lw = 2)
+    ax[0,0].plot(fpr_lvl7, tpr_lvl7, label = 'Dynedge \n AUC: %s'%round(auc_score_lvl7,3), color = gnn_color, lw = 2)
 
+    blue_marker_color = 'cornflowerblue'
+    orange_marker_color = 'orange'
 
-    ax[0,0].plot(x_retro_lvl7, tpr_lvl7[ np.argmin(abs(fpr_lvl7 - x_retro_lvl7))], '^', color = 'lightblue', markersize = 7)
-    ax[0,0].plot(fpr_lvl7[ np.argmin(abs(tpr_lvl7 - y_retro_lvl7))], y_retro_lvl7, 'o', color = 'lightblue', markersize = 7)
-    ax[0,0].plot(x_retro_lvl7,y_retro_lvl7,'o',color = 'darkorange', markersize = 7)
+    sigfigs = 3
+    ax[0,0].plot(x_retro_lvl7, tpr_lvl7[ np.argmin(abs(fpr_lvl7 - x_retro_lvl7))], '^', color = blue_marker_color, markersize = 7)
+    ax[0,0].plot(fpr_lvl7[ np.argmin(abs(tpr_lvl7 - y_retro_lvl7))], y_retro_lvl7, 'o', color = blue_marker_color, markersize = 7)
+    ax[0,0].plot(x_retro_lvl7,y_retro_lvl7,'o',color = orange_marker_color, markersize = 7)
     ### LVL7 ANNOTIATIONS
-    ax[0,0].plot(0.08 + 0.00, 0.566, 'o', color = 'lightblue')
-    ax[0,0].plot(0.08 + 0.00, 0.596, 'o', color = 'darkorange')
-    ax[0,0].plot(0.08 + 0.00, 0.626, '^', color = 'lightblue')
-    ax[0,0].text(0.11 + 0.00, 0.56, '(%s,%s)'%(str(round(fpr_lvl7[ np.argmin(abs(tpr_lvl7 - y_retro_lvl7))],4)), str(round(y_retro_lvl7[0],4))), color = 'tab:blue', fontsize = 8)
-    ax[0,0].text(0.11 + 0.00, 0.59, '(%s,%s)'%(str(round(x_retro_lvl7[0],4)), str(round(y_retro_lvl7[0],4))), color = 'tab:orange', fontsize = 8)
-    ax[0,0].text(0.11 + 0.00, 0.62,'(%s,%s)'%(str(round(x_retro_lvl7[0],4)), str(round(tpr_lvl7[ np.argmin(abs(fpr_lvl7 - x_retro_lvl7))],4))), color = 'tab:blue', fontsize = 8)
+    pos1 = .56 +.015
+    pos2 = .59 +.015
+    pos3 = .62 +.015
+    margin = .006
+    ax[0,0].plot(0.08 + 0.02, pos1 + margin, 'o', color = blue_marker_color)
+    ax[0,0].plot(0.08 + 0.02, pos2 + margin, 'o', color = orange_marker_color)
+    ax[0,0].plot(0.08 + 0.02, pos3 + margin, '^', color = blue_marker_color)
+    ax[0,0].text(0.11 + 0.02, pos1, '(%s, %s)'%(str(round(fpr_lvl7[ np.argmin(abs(tpr_lvl7 - y_retro_lvl7))],sigfigs)), str(round(y_retro_lvl7[0],sigfigs))), color = 'tab:blue', fontsize = 8)
+    ax[0,0].text(0.11 + 0.02, pos2, '(%s, %s)'%(str(round(x_retro_lvl7[0],sigfigs)), str(round(y_retro_lvl7[0],sigfigs))), color = orange_marker_color, fontsize = 8)
+    ax[0,0].text(0.11 + 0.02, pos3,'(%s, %s)'%(str(round(x_retro_lvl7[0],sigfigs)), str(round(tpr_lvl7[ np.argmin(abs(fpr_lvl7 - x_retro_lvl7))],sigfigs))), color = 'tab:blue', fontsize = 8)
 
 
     
@@ -257,13 +266,14 @@ def MakeCombinedPlot(signal_data, track_data):
     ax[0,0].set_xlim([-0.05,0.6])
     #ax[0,0].text(0.45,0.79, '$\\nu / \\mu$', fontsize = 18)
 
+    hist_lw = 1.5
 
-    ax[1,0].hist(expit(signal_data['neutrino_pred'][signal_data['neutrino']==1]), histtype = 'step', label = 'Dynedge $\\nu$', bins = bins, color = 'tab:blue', density = True)
-    ax[1,0].hist(expit(signal_data['neutrino_pred'][signal_data['neutrino']==0]), histtype = 'step', label = 'Dynedge  $\\mu$', bins =  bins, ls = '--', color = 'tab:blue', density = True)
-    ax[1,0].hist(signal_data['L7_MuonClassifier_FullSky_ProbNu'][signal_data['neutrino']==0], histtype = 'step', label = 'BDT  $\\mu$', bins = bins, color = 'tab:orange', ls = '--', density = True)
-    ax[1,0].hist(signal_data['L7_MuonClassifier_FullSky_ProbNu'][signal_data['neutrino']==1], histtype = 'step', label = 'BDT  $\\nu$', bins = bins, color = 'tab:orange', density = True)
-    ax[1,0].plot([0.8,0.8], [0,18], color = 'red', ls = '--')
-    ax[1,0].text(0.75, 7, 'Threshold', rotation = 'vertical', color = 'red', fontsize = 10)
+    ax[1,0].hist(expit(signal_data['neutrino_pred'][signal_data['neutrino']==1]), histtype = 'step', label = 'Dynedge $\\nu$', bins = bins, color = 'tab:blue', density = True, lw=hist_lw)
+    ax[1,0].hist(expit(signal_data['neutrino_pred'][signal_data['neutrino']==0]), histtype = 'step', label = 'Dynedge  $\\mu$', bins =  bins, ls = '--', color = 'tab:blue', density = True, lw=hist_lw)
+    ax[1,0].hist(signal_data['L7_MuonClassifier_FullSky_ProbNu'][signal_data['neutrino']==0], histtype = 'step', label = 'BDT  $\\mu$', bins = bins, color = 'tab:orange', ls = '--', density = True, lw=hist_lw)
+    ax[1,0].hist(signal_data['L7_MuonClassifier_FullSky_ProbNu'][signal_data['neutrino']==1], histtype = 'step', label = 'BDT  $\\nu$', bins = bins, color = 'tab:orange', density = True, lw=hist_lw)
+    ax[1,0].plot([0.8,0.8], [0,18], color = 'tab:red', ls = '--')
+    ax[1,0].text(0.75, 7, 'Threshold', rotation = 'vertical', color = 'tab:red', fontsize = 10)
     ax[1,0].set_ylabel('Area Normalized Counts', size = 10)
     ax[1,0].set_xlabel('Neutrino Score', size = 10)
     ax[1,0].legend(fontsize = 8, frameon = False)
@@ -283,8 +293,8 @@ def MakeCombinedPlot(signal_data, track_data):
     auc_score = auc(fpr,tpr)
     auc_score_retro = auc(fpr_retro,tpr_retro)
 
-    ax[0,1].plot(fpr_retro,tpr_retro, label = 'BDT \n AUC: %s'%(round(auc_score_retro,3)), color = 'orange')
-    ax[0,1].plot(fpr, tpr, label = 'Dynedge \n AUC: %s'%(round(auc_score,3)), color = 'blue')
+    ax[0,1].plot(fpr_retro,tpr_retro, label = 'BDT \n AUC: %s'%(round(auc_score_retro,3)), color = bdt_color, lw=2)
+    ax[0,1].plot(fpr, tpr, label = 'Dynedge \n AUC: %s'%(round(auc_score,3)), color = gnn_color, lw=2)
 
     #labels = [item.get_text() for item in ax[1].get_yticklabels()]
     #empty_string_labels = ['']*len(labels)
@@ -296,10 +306,10 @@ def MakeCombinedPlot(signal_data, track_data):
     #ax[0,1].text(0.5,0.40, '$\\mathcal{T}\\, / \\,\\mathcal{C}$', fontsize = 18)
 
 
-    ax[1,1].hist(data['track_pred'][data['track']==1], histtype = 'step', label = 'Dynedge $\\mathcal{T}$', bins = bins, color = 'tab:blue', density = True)
-    ax[1,1].hist(data['track_pred'][data['track']==0], histtype = 'step', label = 'Dynedge $\\mathcal{C}$', bins =  bins, ls = '--', color = 'tab:blue', density = True)
-    ax[1,1].hist(data['L7_PIDClassifier_FullSky_ProbTrack'][data['track']==0], histtype = 'step', label = 'BDT $\\mathcal{C}$', bins = bins, color = 'tab:orange', ls = '--', density = True)
-    ax[1,1].hist(data['L7_PIDClassifier_FullSky_ProbTrack'][data['track']==1], histtype = 'step', label = 'BDT $\\mathcal{T}$', bins = bins, color = 'tab:orange', density = True)
+    ax[1,1].hist(data['track_pred'][data['track']==1], histtype = 'step', label = 'Dynedge $\\mathcal{T}$', bins = bins, color = 'tab:blue', density = True, lw=hist_lw)
+    ax[1,1].hist(data['track_pred'][data['track']==0], histtype = 'step', label = 'Dynedge $\\mathcal{C}$', bins =  bins, ls = '--', color = 'tab:blue', density = True, lw=hist_lw)
+    ax[1,1].hist(data['L7_PIDClassifier_FullSky_ProbTrack'][data['track']==0], histtype = 'step', label = 'BDT $\\mathcal{C}$', bins = bins, color = 'tab:orange', ls = '--', density = True, lw=hist_lw)
+    ax[1,1].hist(data['L7_PIDClassifier_FullSky_ProbTrack'][data['track']==1], histtype = 'step', label = 'BDT $\\mathcal{T}$', bins = bins, color = 'tab:orange', density = True, lw=hist_lw)
     #ax[1,1].set_yscale('log')
     ax[1,1].yaxis.tick_right()
     ax[1,1].yaxis.set_label_position("right")
@@ -325,8 +335,8 @@ def MakeCombinedPlot(signal_data, track_data):
 
 
 
-signal_data = pd.read_csv('/home/iwsatlas1/oersoe/phd/paper/paper_data/data/0000/signal.csv')
+signal_data = pd.read_csv('/remote/ceph/user/o/oersoe/paper_data/data/0000/signal.csv')
 #MakeBackgroundSignalPlot(data)
-track_data = pd.read_csv('/home/iwsatlas1/oersoe/phd/paper/paper_data/data/0000/track_cascade.csv')
+track_data = pd.read_csv('/remote/ceph/user/o/oersoe/paper_data/data/0000/track_cascade.csv')
 #MakeTrackCascadePlot(data, mode = 'roc')
 MakeCombinedPlot(signal_data = signal_data, track_data= track_data)
